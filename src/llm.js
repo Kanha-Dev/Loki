@@ -64,15 +64,31 @@ async function streamGemini({ apiKey, model, system, turns, imageDataUrl, maxTok
     }
     return { role: t.role === 'assistant' ? 'model' : 'user', parts };
   });
-  const stream = await ai.models.generateContentStream({
-    model, contents, config: { systemInstruction: system, maxOutputTokens: maxTokens }
-  });
-  let full = '';
-  for await (const chunk of stream) {
-    const t = chunk && chunk.text;
-    if (t) { full += t; onToken(t); }
+  try {
+    const stream = await ai.models.generateContentStream({
+      model, contents, config: { systemInstruction: system, maxOutputTokens: maxTokens }
+    });
+    let full = '';
+    for await (const chunk of stream) {
+      const t = chunk && chunk.text;
+      if (t) { full += t; onToken(t); }
+    }
+    return full;
+  } catch (err) {
+    const error = new Error(`Gemini (${model}) request failed: ${err && err.message ? err.message : String(err)}`);
+    error.provider = 'gemini';
+    error.model = model;
+    error.status = err && err.status;
+    error.code = err && err.code;
+    throw error;
   }
-  return full;
+}
+
+function normalizeGeminiModel(model) {
+  if (!model) return 'gemini-3.5-flash';
+  if (model.includes('gemini-1.5') || model === 'gemini-2.0-flash') return 'gemini-3.5-flash';
+  if (model === 'gemini-flash') return 'gemini-flash-latest';
+  return model;
 }
 
 function createLLM(settings) {
@@ -80,7 +96,9 @@ function createLLM(settings) {
   const keys = settings.apiKeys || {};
   const apiKey = keys[provider];
   const tier = settings.smart ? 'smart' : 'fast';
-  const model = (settings.models[provider] || {})[tier];
+  const model = provider === 'gemini'
+    ? normalizeGeminiModel((settings.models[provider] || {})[tier])
+    : (settings.models[provider] || {})[tier];
   const maxTokens = settings.smart ? 1400 : 700;
 
   return {

@@ -15,14 +15,23 @@ async function transcribeOpenAI(apiKey, wav, model) {
 async function transcribeGemini(apiKey, wav) {
   const { GoogleGenAI } = require('@google/genai');
   const ai = new GoogleGenAI({ apiKey });
-  const res = await ai.models.generateContent({
-    model: 'gemini-1.5-flash',
-    contents: [{ role: 'user', parts: [
-      { text: 'Transcribe this audio verbatim. Return only the spoken words with no commentary. If there is no clear speech, return an empty response.' },
-      { inlineData: { mimeType: 'audio/wav', data: wav.toString('base64') } }
-    ] }]
-  });
-  return ((res && res.text) || '').trim();
+  try {
+    const res = await ai.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: [{ role: 'user', parts: [
+        { text: 'Transcribe this audio verbatim. Return only the spoken words with no commentary. If there is no clear speech, return an empty response.' },
+        { inlineData: { mimeType: 'audio/wav', data: wav.toString('base64') } }
+      ] }]
+    });
+    return ((res && res.text) || '').trim();
+  } catch (err) {
+    const error = new Error(`Gemini STT request failed: ${err && err.message ? err.message : String(err)}`);
+    error.provider = 'gemini';
+    error.model = 'gemini-2.0-flash';
+    error.status = err && err.status;
+    error.code = err && err.code;
+    throw error;
+  }
 }
 
 function createSTT(settings) {
