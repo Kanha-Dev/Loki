@@ -29,6 +29,7 @@ cue floats a small glass panel on top of everything. It takes **three separate i
 | **Recap** | button | the whole conversation |
 | **Ask anything** | type + `↵` | your screen + conversation |
 | **Solve a coding problem** | `⌘` `H` | your screen only |
+| **Meeting Notes** | Notes button in top dock | meeting audio + your mic (persistent) |
 | **Smart** toggle | pill in the box | switches to a smarter (slower) model |
 
 It's a copilot for **live meetings** ("what do I say to that?") and **coding problems** (screenshot → full solution), and it's designed to be **invisible in screen shares** so it stays your private assistant.
@@ -86,7 +87,7 @@ cue can't help until macOS lets it see and hear. When you first use a feature, m
 
 ### Step 2 — Add your AI key (bring your own)
 
-cue uses **your own** API key, so it's free to run (you only pay your AI provider for what you use). Click the **`...`** button in the input box (or press `⌘` `,`) to open **Settings**, pick a provider, and paste your key:
+cue uses **your own** API key, so it's free to run (you only pay your AI provider for what you use). Click the **Settings** button in the top dock (or press `⌘` `,`) to open **Settings**, pick a provider, and paste your key:
 
 | Provider | Get a key | Notes |
 |---|---|---|
@@ -113,11 +114,13 @@ cue is hidden from most screen-share tools automatically — **Google Meet, Micr
 - **`⌘` `↵` — Assist.** The do-the-smart-thing key. On a coding problem it solves it; in a conversation it tells you what to say. Works from anywhere.
 - **`⌘` `H` — Solve what's on screen.** Screenshots a coding problem and returns the approach, code, and time/space complexity.
 - **The `▢` button** (top bar) — start/stop **listening** to a meeting. The green dot means it's live.
+- **Notes button** (top dock) — toggle the **Meeting Notes** panel for persistent note-taking during meetings. Click Start to begin capturing conversation summaries.
 - **Type a question** in the box and press `↵` to ask about your screen or conversation.
 - **Smart** — flip it on for a smarter, more thorough model; off for fast and cheap.
+- **Settings** — click the Settings button in the top dock (or press `⌘` `,`) to configure API keys, models, and preferences.
 - **Hide** collapses the panel to just the top bar. Drag cue around by the **top pill**. Quit with `⌘` `⇧` `X`.
 
-The panel is see-through and click-through — the empty space around it never blocks the app behind it.
+The panel is see-through and click-through — the empty space around it never blocks the app behind it. All panels are draggable and resizable, and their positions are saved between sessions.
 
 ---
 

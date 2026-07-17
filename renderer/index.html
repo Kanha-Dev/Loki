@@ -3,27 +3,32 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:;" />
-  <title>cue</title>
+  <title>albert</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="app">
-    <!-- Top-center floating pill toolbar (drag handle) -->
+    <!-- Top-center floating pill toolbar (window drag handle) -->
     <div id="toolbar">
-      <button class="tb-logo" id="logo-btn" title="cue"></button>
+      <button class="tb-logo" id="logo-btn" title="albert"></button>
       <div class="tb-divider"></div>
-      <button class="tb-hide" id="hide-btn"><span class="chev"></span><span>Hide</span></button>
+      <button class="tb-hide" id="hide-btn"><span class="chev"></span><span>Hide UI</span></button>
       <div class="tb-divider"></div>
       <button class="tb-stop" id="stop-btn" title="Start / stop listening"></button>
+      <div class="tb-divider"></div>
+      <button class="tb-toggle" id="toggle-panel-btn" title="Toggle main panel">Panel</button>
+      <button class="tb-toggle" id="toggle-meeting-btn" title="Toggle meeting panel">Notes</button>
+      <button class="tb-toggle" id="toggle-settings-btn" title="Toggle settings">Settings</button>
     </div>
 
-    <!-- Main assistant panel -->
-    <div id="panel-wrap">
+    <!-- Main assistant panel — center top -->
+    <div id="panel-wrap" class="floating-panel">
+      <div class="panel-drag-bar" title="Drag to move"></div>
       <span id="live-dot" class="off"></span>
       <div id="panel" class="glass no-drag">
-        <div id="messages"></div>
+          <div id="messages"></div>
 
-        <div id="action-row">
+          <div id="action-row">
           <button class="act" data-mode="assist"><span class="ic"></span><span>Assist</span></button>
           <span class="sep">•</span>
           <button class="act" data-mode="say"><span class="ic"></span><span>What should I say?</span></button>
@@ -31,6 +36,9 @@
           <button class="act" data-mode="followup"><span class="ic"></span><span>Follow-up questions</span></button>
           <span class="sep">•</span>
           <button class="act" data-mode="recap"><span class="ic"></span><span>Recap</span></button>
+          <span class="sep">•</span>
+          <button id="persist-toggle" class="toggle-pill"><span class="toggle-track"><span class="toggle-thumb"></span></span><span>Persistent</span></button>
+          <button id="debug-toggle" class="toggle-pill"><span class="debug-label">Debug</span></button>
         </div>
 
         <div id="composer">
@@ -40,42 +48,316 @@
           </div>
           <div id="composer-bottom">
             <button id="smart-toggle" class="smart-pill"><span class="ic"></span><span>Smart</span></button>
-            <button id="more-btn" class="more-btn" title="Settings"></button>
+            <div class="more-menu-container">
+              <button id="more-btn" class="more-btn" title="Menu"></button>
+              <div id="more-menu" class="more-menu hidden">
+                <div class="more-menu-item">
+                  <span class="more-menu-label">Placeholder Feature</span>
+                  <button id="placeholder-toggle" class="toggle-switch">
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  </button>
+                </div>
+              </div>
+            </div>
             <div class="spacer"></div>
             <button id="send-btn" title="Send"></button>
           </div>
         </div>
+        <div id="main-debug" class="terminal hidden"></div>
+
       </div>
+      <div class="resize-handle" aria-hidden="true"></div>
+    </div>
+
+    <!-- Meeting notes — upper right -->
+    <div id="meeting-side" class="glass no-drag floating-panel">
+      <div class="meeting-head">
+        <div class="meeting-title">Meeting Notes</div>
+        <button id="meeting-toggle" class="meeting-btn">Start</button>
+      </div>
+      <div id="meeting-status" class="meeting-status">Stopped</div>
+      <div id="meeting-list" class="meeting-list"></div>
+      <div class="meeting-footer">
+        <button id="transcript-btn" class="toggle-pill"><span class="debug-label">Transcripts</span></button>
+        <button id="notes-debug-toggle" class="toggle-pill"><span class="debug-label">Terminal</span></button>
+      </div>
+      <div id="meeting-debug" class="terminal hidden"></div>
+      <div class="resize-handle" aria-hidden="true"></div>
+    </div>
+
+    <!-- Transcript — lower right, below meeting notes -->
+    <div id="transcript-pane" class="glass no-drag floating-panel hidden">
+      <div class="meeting-head">
+        <div class="meeting-title">Transcript Sessions</div>
+        <button id="close-transcript" class="meeting-btn">Close</button>
+      </div>
+      <div id="transcript-list" class="meeting-list"></div>
+      <div class="resize-handle" aria-hidden="true"></div>
     </div>
   </div>
 
   <!-- Settings -->
-  <div id="settings-scrim" class="hidden">
+  <div id="settings-wrap" class="floating-panel hidden">
+    <div class="panel-drag-bar" title="Drag to move"></div>
     <div id="settings" class="glass">
       <div class="s-head">
         <div class="s-title">Settings</div>
         <button id="s-close" class="s-close">Done</button>
       </div>
-      <div class="s-body">
-        <label class="s-label">Provider</label>
-        <div class="s-seg" id="provider-seg">
-          <button data-provider="openai">OpenAI</button>
-          <button data-provider="anthropic">Anthropic</button>
-          <button data-provider="gemini">Gemini</button>
+      <div class="s-layout">
+        <!-- Sidebar Menu -->
+        <div class="s-sidebar">
+          <div class="s-sidebar-section">
+            <div class="s-sidebar-title">General</div>
+            <button class="s-sidebar-item active" data-tab="api">
+              <span class="s-sidebar-icon">🔑</span>
+              <span>API Keys</span>
+            </button>
+            <button class="s-sidebar-item" data-tab="models">
+              <span class="s-sidebar-icon">🤖</span>
+              <span>Models</span>
+            </button>
+            <button class="s-sidebar-item" data-tab="chat">
+              <span class="s-sidebar-icon">💬</span>
+              <span>Chat & Notes</span>
+            </button>
+          </div>
+          <div class="s-sidebar-section">
+            <div class="s-sidebar-title">Customization</div>
+            <button class="s-sidebar-item" data-tab="shortcuts">
+              <span class="s-sidebar-icon">⌨️</span>
+              <span>Shortcuts</span>
+            </button>
+            <button class="s-sidebar-item" data-tab="layout">
+              <span class="s-sidebar-icon">📐</span>
+              <span>Layout</span>
+            </button>
+            <button class="s-sidebar-item" data-tab="usage">
+              <span class="s-sidebar-icon">📊</span>
+              <span>Usage</span>
+            </button>
+          </div>
         </div>
 
-        <label class="s-label">API keys <span class="s-hint">stored locally in cue-data.json</span></label>
-        <div class="s-field"><span>OpenAI</span><input id="key-openai" type="password" placeholder="sk-..." autocomplete="off" /></div>
-        <div class="s-field"><span>Anthropic</span><input id="key-anthropic" type="password" placeholder="sk-ant-..." autocomplete="off" /></div>
-        <div class="s-field"><span>Gemini</span><input id="key-gemini" type="password" placeholder="AIza..." autocomplete="off" /></div>
+        <!-- Content Area -->
+        <div class="s-content">
+          <!-- API Tab -->
+          <div class="s-tab-content active" data-tab="api">
+            <div class="s-section">
+              <h3 class="s-section-title">Provider</h3>
+              <div class="s-seg" id="provider-seg">
+                <button data-provider="openai">OpenAI</button>
+                <button data-provider="anthropic">Anthropic</button>
+                <button data-provider="gemini">Gemini</button>
+              </div>
+            </div>
 
-        <label class="s-label">Models <span class="s-hint">fast = Smart off · smart = Smart on</span></label>
-        <div class="s-field"><span>Fast</span><input id="model-fast" type="text" autocomplete="off" /></div>
-        <div class="s-field"><span>Smart</span><input id="model-smart" type="text" autocomplete="off" /></div>
+            <div class="s-section">
+              <h3 class="s-section-title">API Keys</h3>
+              <p class="s-section-desc">Your keys are stored locally in cue-data.json and sent only to the chosen provider.</p>
+              <div class="s-field-group">
+                <div class="s-field">
+                  <label>OpenAI</label>
+                  <input id="key-openai" type="password" placeholder="sk-..." autocomplete="off" />
+                </div>
+                <div class="s-field">
+                  <label>Anthropic</label>
+                  <input id="key-anthropic" type="password" placeholder="sk-ant-..." autocomplete="off" />
+                </div>
+                <div class="s-field">
+                  <label>Gemini</label>
+                  <input id="key-gemini" type="password" placeholder="AIza..." autocomplete="off" />
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <div class="s-status" id="s-status"></div>
+          <!-- Models Tab -->
+          <div class="s-tab-content" data-tab="models">
+            <div class="s-section">
+              <h3 class="s-section-title">AI Models</h3>
+              <p class="s-section-desc">Configure which models to use. Fast = Smart off, Smart = Smart on.</p>
+              <div class="s-field-group">
+                <div class="s-field">
+                  <label>Fast Model</label>
+                  <input id="model-fast" type="text" placeholder="gpt-4o-mini" autocomplete="off" />
+                </div>
+                <div class="s-field">
+                  <label>Smart Model</label>
+                  <input id="model-smart" type="text" placeholder="gpt-4o" autocomplete="off" />
+                </div>
+              </div>
+            </div>
+
+            <div class="s-section">
+              <h3 class="s-section-title">Model Detection</h3>
+              <p class="s-section-desc">Automatically detect available models for your API key and use recommended settings.</p>
+              <button id="detect-models-btn" class="s-reset-btn">Detect Available Models</button>
+              <div id="detection-status" class="detection-status"></div>
+              <div id="detection-results" class="detection-results hidden">
+                <div id="models-list" class="models-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Tab -->
+          <div class="s-tab-content" data-tab="chat">
+            <div class="s-section">
+              <h3 class="s-section-title">Chat Settings</h3>
+              <div class="s-field-group">
+                <div class="s-field s-field-toggle">
+                  <label>Persistent Chat</label>
+                  <label class="s-toggle">
+                    <input id="chat-persist" type="checkbox" />
+                    <span class="s-toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="s-section">
+              <h3 class="s-section-title">Meeting Notes</h3>
+              <p class="s-section-desc">Automatically generate meeting notes when listening is enabled.</p>
+              <div class="s-field-group">
+                <div class="s-field s-field-toggle">
+                  <label>Enable Meeting Notes</label>
+                  <label class="s-toggle">
+                    <input id="meeting-notes-enabled" type="checkbox" />
+                    <span class="s-toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="s-field">
+                  <label>Update Interval (seconds)</label>
+                  <input id="meeting-notes-interval" type="number" min="15" step="15" value="60" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shortcuts Tab -->
+          <div class="s-tab-content" data-tab="shortcuts">
+            <div class="s-section">
+              <h3 class="s-section-title">Keyboard Shortcuts</h3>
+              <p class="s-section-desc">Click on a shortcut to record a new one. Press the keys you want to assign.</p>
+              <div class="s-shortcuts-list">
+                <div class="s-shortcut-item">
+                  <div class="s-shortcut-info">
+                    <span class="s-shortcut-label">LeetCode Collect</span>
+                    <span class="s-shortcut-desc">Capture multiple screenshots</span>
+                  </div>
+                  <button id="shortcut-leetcode-collect" class="s-shortcut-btn" data-shortcut="leetcodeCollect">
+                    <span class="s-shortcut-keys">⌘⇧H</span>
+                    <span class="s-shortcut-hint">Click to change</span>
+                  </button>
+                </div>
+                <div class="s-shortcut-item">
+                  <div class="s-shortcut-info">
+                    <span class="s-shortcut-label">LeetCode Send</span>
+                    <span class="s-shortcut-desc">Send screenshots for solving</span>
+                  </div>
+                  <button id="shortcut-leetcode-send" class="s-shortcut-btn" data-shortcut="leetcodeSend">
+                    <span class="s-shortcut-keys">⌘H</span>
+                    <span class="s-shortcut-hint">Click to change</span>
+                  </button>
+                </div>
+                <div class="s-shortcut-item">
+                  <div class="s-shortcut-info">
+                    <span class="s-shortcut-label">Assist</span>
+                    <span class="s-shortcut-desc">Get AI assistance</span>
+                  </div>
+                  <button id="shortcut-assist" class="s-shortcut-btn" data-shortcut="assist">
+                    <span class="s-shortcut-keys">⌘↵</span>
+                    <span class="s-shortcut-hint">Click to change</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Layout Tab -->
+          <div class="s-tab-content" data-tab="layout">
+            <div class="s-section">
+              <h3 class="s-section-title">Panel Layout</h3>
+              <p class="s-section-desc">Reset all panels and toolbar to their default positions and sizes.</p>
+              <button id="reset-layout-btn" class="s-reset-btn">Reset All Panels</button>
+            </div>
+          </div>
+
+          <!-- Usage Tab -->
+          <div class="s-tab-content" data-tab="usage">
+            <div class="s-section">
+              <h3 class="s-section-title">Token Usage</h3>
+              <p class="s-section-desc">Track your API token usage and costs. Resets monthly.</p>
+              
+              <div class="usage-overview">
+                <div class="usage-stat">
+                  <span class="usage-label">Total Tokens</span>
+                  <span id="usage-total-tokens" class="usage-value">0</span>
+                </div>
+                <div class="usage-stat">
+                  <span class="usage-label">Total Cost</span>
+                  <span id="usage-total-cost" class="usage-value">$0.00</span>
+                </div>
+                <div class="usage-stat">
+                  <span class="usage-label">Monthly Limit</span>
+                  <span id="usage-monthly-limit" class="usage-value">$10.00</span>
+                </div>
+              </div>
+
+              <div class="usage-bar-container">
+                <div class="usage-bar-label">Monthly Usage</div>
+                <div class="usage-bar">
+                  <div id="usage-bar-fill" class="usage-bar-fill" style="width: 0%"></div>
+                </div>
+                <div class="usage-bar-text">
+                  <span id="usage-percentage">0%</span>
+                  <span id="usage-remaining">$10.00 remaining</span>
+                </div>
+              </div>
+
+              <div class="s-field-group">
+                <div class="s-field">
+                  <label>Monthly Limit ($)</label>
+                  <input id="usage-limit-input" type="number" min="1" step="1" value="10" />
+                </div>
+                <button id="set-limit-btn" class="s-reset-btn">Set Limit</button>
+                <button id="reset-usage-btn" class="s-reset-btn s-secondary-btn">Reset Usage</button>
+              </div>
+            </div>
+
+            <div class="s-section">
+              <h3 class="s-section-title">Usage by Provider</h3>
+              <div id="usage-by-provider" class="usage-breakdown"></div>
+            </div>
+
+            <div class="s-section">
+              <h3 class="s-section-title">Usage by Model</h3>
+              <div id="usage-by-model" class="usage-breakdown"></div>
+            </div>
+          </div>
+
+          <div class="s-status" id="s-status"></div>
+        </div>
       </div>
     </div>
+    <div class="resize-handle" aria-hidden="true"></div>
+  </div>
+
+
+
+  <!-- LeetCode collection panel (left side) -->
+  <div id="leetcode-panel" class="glass no-drag floating-panel hidden">
+    <div class="leetcode-head">
+      <div class="leetcode-title">LeetCode Capture</div>
+      <button id="leetcode-close-btn" class="meeting-btn">×</button>
+    </div>
+    <div id="leetcode-status" class="leetcode-status">Capturing...</div>
+    <div id="leetcode-screenshots" class="leetcode-screenshots"></div>
+    <div class="leetcode-footer">
+      <button id="leetcode-more-btn" class="meeting-btn">+ Take More (⌘⇧H)</button>
+      <button id="leetcode-solve-btn" class="meeting-btn active">Get Answer (⌘H)</button>
+    </div>
+    <div class="resize-handle" aria-hidden="true"></div>
   </div>
 
   <!-- First-run tutorial / walkthrough -->

@@ -1,18 +1,20 @@
 {
-  "name": "cue",
+  "name": "albert",
   "version": "0.1.0",
-  "description": "Open-source macOS invisible AI overlay — three separate inputs (screen, mic, system audio) into an LLM. A Cluely-style copilot for meetings and coding problems.",
+  "description": "albert is a macOS invisible AI overlay — screen, mic, and system audio feed into an LLM for meetings and coding help.",
   "license": "GPL-3.0-or-later",
-  "author": "cue",
+  "author": "albert",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "npx electron@33.2.1 .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --mac zip"
+    "dist": "electron-builder --mac zip",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "build": {
-    "appId": "com.cue.overlay",
-    "productName": "cue",
+    "appId": "com.albert.overlay",
+    "productName": "albert",
     "asar": false,
     "files": [
       "main.js",
@@ -30,9 +32,9 @@
       "identity": null,
       "extendInfo": {
         "LSUIElement": true,
-        "NSMicrophoneUsageDescription": "cue transcribes your microphone so it can help you in conversations.",
-        "NSCameraUsageDescription": "cue does not use the camera.",
-        "NSAudioCaptureUsageDescription": "cue captures system audio to transcribe the other participant in a call."
+        "NSMicrophoneUsageDescription": "albert transcribes your microphone so it can help you in conversations.",
+        "NSCameraUsageDescription": "albert does not use the camera.",
+        "NSAudioCaptureUsageDescription": "albert captures system audio to transcribe the other participant in a call."
       }
     }
   },
@@ -46,12 +48,16 @@
   ],
   "devDependencies": {
     "electron": "33.2.1",
-    "electron-builder": "^24.13.3"
+    "electron-builder": "^24.13.3",
+    "jest": "^29.7.0"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
-    "@google/genai": "^0.3.0",
+    "@google/genai": "^2.12.0",
     "lucide-static": "^0.468.0",
     "openai": "^4.73.0"
+  },
+  "allowScripts": {
+    "electron@33.2.1": true
   }
 }
