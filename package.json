@@ -1,9 +1,9 @@
 {
-  "name": "albert",
+  "name": "loki",
   "version": "0.1.0",
-  "description": "albert is a macOS invisible AI overlay — screen, mic, and system audio feed into an LLM for meetings and coding help.",
+  "description": "loki is a macOS invisible AI overlay — screen, mic, and system audio feed into an LLM for meetings and coding help.",
   "license": "GPL-3.0-or-later",
-  "author": "albert",
+  "author": "loki",
   "main": "main.js",
   "scripts": {
     "start": "npx electron@33.2.1 .",
@@ -13,8 +13,8 @@
     "test:watch": "jest --watch"
   },
   "build": {
-    "appId": "com.albert.overlay",
-    "productName": "albert",
+    "appId": "com.loki.overlay",
+    "productName": "loki",
     "asar": false,
     "files": [
       "main.js",
@@ -32,9 +32,9 @@
       "identity": null,
       "extendInfo": {
         "LSUIElement": true,
-        "NSMicrophoneUsageDescription": "albert transcribes your microphone so it can help you in conversations.",
-        "NSCameraUsageDescription": "albert does not use the camera.",
-        "NSAudioCaptureUsageDescription": "albert captures system audio to transcribe the other participant in a call."
+        "NSMicrophoneUsageDescription": "loki transcribes your microphone so it can help you in conversations.",
+        "NSCameraUsageDescription": "loki does not use the camera.",
+        "NSAudioCaptureUsageDescription": "loki captures system audio to transcribe the other participant in a call."
       }
     }
   },

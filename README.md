@@ -1,183 +1,241 @@
 <div align="center">
 
-# cue
+# loki
 
-**An open-source AI copilot that floats over your screen — sees what you see, hears your meetings, and stays hidden from screen shares.**
+**An intelligent AI assistant that floats invisibly over your screen — seeing what you see, hearing your conversations, and staying hidden from screen shares.**
 
-A free, self-hosted alternative to Cluely. Bring your own AI key (OpenAI · Anthropic · Google Gemini).
-
-<img src="docs/tutorial.png" width="620" alt="cue first-run tutorial" />
+A free, open-source alternative to proprietary AI copilots. Bring your own API keys (OpenAI · Anthropic · Google Gemini).
 
 </div>
 
 ---
 
-> [!IMPORTANT]
-> **Please read this first.** cue tries to stay out of screen recordings/shares, but this is **best-effort, not guaranteed** — on macOS 15.4+ Apple can let modern capture tools see it anyway, and a phone camera always can. Using a hidden assistant during a **proctored exam, job interview, or recorded meeting** may break that platform's rules and, in some places, consent laws. cue is built for legitimate uses — your own notes, studying, accessibility, and practice. **You are responsible for how you use it.**
+> [!WARNING]  
+> **Important:** loki attempts to stay hidden from screen recordings, but this is **best-effort, not guaranteed**. On macOS 15.4+, some capture tools may still detect it, and phone cameras always can. Using a hidden assistant during **proctored exams, job interviews, or recorded meetings** may violate platform policies or local consent laws. loki is designed for legitimate use cases: personal note-taking, studying, accessibility, and practice. **You are responsible for how you use it.**
 
 ---
 
-## What it does
+## Features
 
-cue floats a small glass panel on top of everything. It takes **three separate inputs** — your **screen**, your **microphone**, and your **meeting audio** (what the other person says) — and uses an AI model to help you in real time.
+loki provides real-time AI assistance by combining three inputs: your screen, your microphone, and meeting audio from other participants.
 
-| Feature | How to trigger | What it uses |
-|---|---|---|
-| **Assist** | `⌘` `↵` or the *Assist* button | your screen + recent conversation |
-| **What should I say?** | button | meeting audio + your mic |
-| **Follow-up questions** | button | the whole conversation |
-| **Recap** | button | the whole conversation |
-| **Ask anything** | type + `↵` | your screen + conversation |
-| **Solve a coding problem** | `⌘` `H` | your screen only |
-| **Meeting Notes** | Notes button in top dock | meeting audio + your mic (persistent) |
-| **Smart** toggle | pill in the box | switches to a smarter (slower) model |
+### Core Capabilities
 
-It's a copilot for **live meetings** ("what do I say to that?") and **coding problems** (screenshot → full solution), and it's designed to be **invisible in screen shares** so it stays your private assistant.
+- **Smart Assistance** — Press `⌘` `↵` anywhere to get contextual help based on what's on your screen and what's being discussed
+- **Coding Problem Solver** — Press `⌘` `H` to capture and solve coding problems with approach, code, and complexity analysis
+- **Conversation Guidance** — Get suggestions for what to say in meetings based on both sides of the conversation
+- **Meeting Notes** — Automatically generate and maintain persistent notes during meetings with configurable intervals
+- **Follow-up Questions** — Receive intelligent suggestions for relevant follow-up questions to keep conversations productive
+- **Session Recap** — Get a concise summary of the entire conversation for anyone joining late
+- **Flexible Querying** — Type any question and get answers based on your screen context and conversation history
+- **Model Selection** — Switch between fast and smart AI models depending on your needs
+
+### Interface Features
+
+- **Glassmorphism UI** — Beautiful, transparent panel that floats above everything
+- **Click-through Design** — Empty space around the panel doesn't block the app behind it
+- **Draggable & Resizable** — All panels can be repositioned and resized; positions persist between sessions
+- **Screen Share Protection** — Designed to stay hidden from most screen capture tools (best-effort)
+- **Persistent Chat History** — Optionally save your conversation history between sessions
+- **Usage Tracking** — Monitor token usage and costs with monthly spending limits
 
 ---
 
-## Install
+## Installation
 
-There are two ways to install cue. **If you're not a developer, use Option A.**
+### Option A: Pre-built Application (Recommended)
 
-### Option A — Download the app (easiest)
-
-1. Go to the [**Releases**](../../releases) page and download **`cue-mac.zip`**.
-2. Double-click the zip to unzip it. You'll get **`cue.app`**.
-3. Drag **`cue.app`** into your **Applications** folder.
-4. **First open (important):** because cue is a free app without a paid Apple certificate, macOS will refuse to open it normally the first time. Do this once:
-   - **Right-click** `cue.app` → **Open** → click **Open** in the dialog.
-   - If macOS instead says **"cue is damaged and can't be opened,"** open the **Terminal** app and paste this line, then press Return:
+1. Visit the [Releases](../../releases) page and download `loki-mac.zip`
+2. Unzip the file to get `loki.app`
+3. Move `loki.app` to your Applications folder
+4. **First-time setup:** Since loki is unsigned, macOS requires special handling:
+   - Right-click `loki.app` → Open → click Open in the dialog
+   - If you see "loki is damaged and can't be opened," run this in Terminal:
      ```bash
-     xattr -cr /Applications/cue.app
+     xattr -cr /Applications/loki.app
      ```
-     Then double-click cue.app again. (This just tells macOS "yes, I trust this app I downloaded." It's safe.)
+   - Then double-click loki.app again
 
-After that, cue opens normally forever.
+After this initial setup, loki will open normally.
 
-### Option B — Run from source (developers)
+### Option B: Build from Source
 
-You need [Node.js](https://nodejs.org) 18+ installed. No Xcode required.
+Requires Node.js 18+.
 
 ```bash
-git clone https://github.com/Blueturboguy07/cue.git
-cd cue
+git clone https://github.com/Blueturboguy07/loki.git
+cd loki
 npm install
 npm start
 ```
 
-To build your own `cue.app`:
+To build your own application:
+
 ```bash
-npm run pack      # creates dist/mac-arm64/cue.app
+npm run pack  # Creates dist/mac-arm64/loki.app
 ```
-> Note: the packaged app is **ad-hoc signed** (no paid Apple certificate). macOS ties permission grants to the exact build, so **rebuilding resets the mic/screen permissions** — you'll grant them again. For everyday use, build once and keep it.
+
+**Note:** Built apps are ad-hoc signed. Rebuilding changes the app identity, so you'll need to regrant macOS permissions. For daily use, build once and keep it.
 
 ---
 
-## First launch — the 1-minute setup
+## Getting Started
 
-When cue opens the first time, a **built-in tutorial** walks you through everything below. You can reopen it anytime by clicking the **cue logo** (top-left of the pill). Here's the same thing in writing.
+When you first launch loki, a built-in tutorial guides you through setup. You can also access it anytime by clicking the loki logo in the top-left corner.
 
-### Step 1 — Grant two macOS permissions
+### Step 1: Grant macOS Permissions
 
-cue can't help until macOS lets it see and hear. When you first use a feature, macOS will prompt you — click **Allow**. If a prompt doesn't appear, add cue manually:
+loki needs permission to see and hear:
 
-- **Microphone:** System Settings → **Privacy & Security** → **Microphone** → turn on **cue**.
-- **Screen Recording:** System Settings → **Privacy & Security** → **Screen Recording** → turn on **cue**. (This one grant covers both screenshots *and* meeting audio.) macOS may ask you to **quit & reopen** cue — let it.
+- **Microphone:** System Settings → Privacy & Security → Microphone → Enable loki
+- **Screen Recording:** System Settings → Privacy & Security → Screen Recording → Enable loki
 
-### Step 2 — Add your AI key (bring your own)
+macOS may ask you to quit and reopen loki after granting permissions.
 
-cue uses **your own** API key, so it's free to run (you only pay your AI provider for what you use). Click the **Settings** button in the top dock (or press `⌘` `,`) to open **Settings**, pick a provider, and paste your key:
+### Step 2: Configure AI Provider
 
-| Provider | Get a key | Notes |
-|---|---|---|
-| **OpenAI** | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) | One key does everything — **but** for the *listening* features the key must have **Whisper / audio** access (a "restricted" project key that only allows chat will give a 403 on transcription). |
-| **Anthropic (Claude)** | [console.anthropic.com](https://console.anthropic.com) | Great for screen & coding help. Claude has no speech-to-text, so add an OpenAI or Gemini key too if you want the listening features. |
-| **Google Gemini** | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) | One key does chat + transcription. |
+loki uses your own API keys — no subscription required. Open Settings (⌘ `,`) and add your key:
 
-Your key is stored **only on your computer** (in `cue-data.json`) and is sent **only** to that provider. cue has no server and collects nothing.
+| Provider | Where to get key | Notes |
+|----------|------------------|-------|
+| **OpenAI** | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) | Supports all features, but key must have Whisper/audio access for transcription |
+| **Anthropic** | [console.anthropic.com](https://console.anthropic.com) | Excellent for coding and screen help; no speech-to-text, so add OpenAI/Gemini key for audio features |
+| **Google Gemini** | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) | Single key handles both chat and transcription |
 
-### Step 3 — The Zoom setting (only needed for Zoom)
+Your keys are stored locally in `loki-data.json` and sent only to your chosen provider.
 
-cue is hidden from most screen-share tools automatically — **Google Meet, Microsoft Teams, and QuickTime need nothing.** **Zoom** has a specific setting that decides whether it respects cue's "don't capture me" flag:
+### Step 3: Zoom Configuration (Optional)
 
-> **Zoom → Settings → Share Screen → Advanced → Screen capture mode → choose "Advanced capture with window filtering."**
+loki hides automatically from most screen share tools (Google Meet, Teams, QuickTime). For Zoom, enable this setting:
 
-<div align="center"><img src="docs/zoom-setting.png" width="560" alt="Zoom screen capture mode setting" /></div>
+**Zoom → Settings → Share Screen → Advanced → Screen capture mode → "Advanced capture with window filtering"**
 
-**Why:** the *"...with window filtering"* modes tell Zoom to leave out windows that mark themselves as private — which is exactly what cue does. The **"Advanced capture without window filtering"** mode grabs the raw screen and **will show cue**, so avoid it.
-
----
-
-## How to use it
-
-- **`⌘` `↵` — Assist.** The do-the-smart-thing key. On a coding problem it solves it; in a conversation it tells you what to say. Works from anywhere.
-- **`⌘` `H` — Solve what's on screen.** Screenshots a coding problem and returns the approach, code, and time/space complexity.
-- **The `▢` button** (top bar) — start/stop **listening** to a meeting. The green dot means it's live.
-- **Notes button** (top dock) — toggle the **Meeting Notes** panel for persistent note-taking during meetings. Click Start to begin capturing conversation summaries.
-- **Type a question** in the box and press `↵` to ask about your screen or conversation.
-- **Smart** — flip it on for a smarter, more thorough model; off for fast and cheap.
-- **Settings** — click the Settings button in the top dock (or press `⌘` `,`) to configure API keys, models, and preferences.
-- **Hide** collapses the panel to just the top bar. Drag cue around by the **top pill**. Quit with `⌘` `⇧` `X`.
-
-The panel is see-through and click-through — the empty space around it never blocks the app behind it. All panels are draggable and resizable, and their positions are saved between sessions.
+This tells Zoom to respect loki's privacy flag. The "without window filtering" mode will capture loki.
 
 ---
 
-## How it works (under the hood)
+## Keyboard Shortcuts
 
-cue is an [Electron](https://www.electronjs.org/) app. Everything runs locally except the calls to your chosen AI provider.
+| Shortcut | Action |
+|----------|--------|
+| `⌘` `↵` | Get smart assistance based on current context |
+| `⌘` `H` | Solve the coding problem visible on screen |
+| `⌘` `,` | Open Settings |
+| `⌘` `⇧` `X` | Quit loki |
 
-**The three inputs are kept completely separate:**
-- **Screen** — captured with Electron's `desktopCapturer` (full-resolution screenshots, taken only when a feature needs one).
-- **Your mic ("You")** — `getUserMedia` → downsampled to 16 kHz audio → transcribed.
-- **Meeting audio ("Them")** — `getDisplayMedia` loopback capture of your system's output audio, kept on its own channel so cue knows *who* said what.
+---
 
-Both audio streams are transcribed (OpenAI Whisper or Gemini) and fed, with an optional screenshot, to your AI model. Responses **stream** into the panel word-by-word.
+## Using the Interface
 
-**The invisibility** is a single macOS window flag: `setContentProtection(true)`, which sets `NSWindowSharingNone`. This asks the window server to exclude cue from screen-capture streams. It's the same mechanism DRM apps and Zoom's own toolbar use. It is **not** a GPU trick or a special overlay layer — and on macOS 15.4+ Apple lets some capture tools ignore it, which is why it's best-effort (see the disclaimer at the top).
+### Main Panel
+
+- **Input Box** — Type questions and press Enter to query your screen and conversation
+- **Action Buttons** — Quick access to common features (Assist, Say, Follow-up, Recap)
+- **Smart Toggle** — Switch between fast (default) and smart AI models
+- **Chat Persistence** — Toggle to save conversation history between sessions
+
+### Top Toolbar
+
+- **Logo Button** — Access the onboarding tutorial
+- **Hide UI** — Collapse to just the toolbar
+- **Stop Button (▢)** — Start/stop meeting audio capture (green dot = active)
+- **Panel Toggle** — Show/hide the main panel
+- **Notes Toggle** — Open the Meeting Notes panel
+- **Settings Toggle** — Open configuration panel
+
+### Meeting Notes Panel
+
+- **Start/Stop** — Begin or end note-taking session
+- **Interval Setting** — Configure how often to generate notes (default: 60 seconds)
+- **Session History** — View and manage previous note sessions
+- **Transcript View** — See the conversation transcript being used for notes
+
+### Settings Panel
+
+- **Provider Selection** — Choose between OpenAI, Anthropic, or Gemini
+- **API Keys** — Enter and manage your provider keys
+- **Model Configuration** — Set fast and smart model names per provider
+- **Usage Tracking** — View token usage and costs, set monthly limits
+- **Layout Reset** — Restore default panel positions if needed
+
+---
+
+## Technical Details
+
+loki is built with [Electron](https://www.electronjs.org/). Everything runs locally except AI API calls.
+
+### Architecture
 
 ```
-main process ──┬─ overlay window (frameless, transparent, always-on-top, content-protected)
-               ├─ screenshot capture (desktopCapturer)
-               ├─ speech-to-text (Whisper / Gemini)      ── "You" + "Them" channels
-               └─ LLM streaming (OpenAI / Anthropic / Gemini)
-renderer ──────┴─ the glass UI + mic capture + system-audio loopback
+Main Process
+├── Overlay window (frameless, transparent, always-on-top, content-protected)
+├── Screenshot capture (desktopCapturer)
+├── Speech-to-text (Whisper / Gemini) → "You" + "Them" channels
+└── LLM streaming (OpenAI / Anthropic / Gemini)
+
+Renderer Process
+└── Glass UI + mic capture + system-audio loopback
 ```
+
+### Input Handling
+
+- **Screen** — Captured via Electron's desktopCapturer when needed
+- **Your Microphone** — getUserMedia → downsampled to 16kHz → transcribed
+- **Meeting Audio** — getDisplayMedia loopback captures system output on separate channel
+
+### Privacy Implementation
+
+The invisibility feature uses `setContentProtection(true)`, setting `NSWindowSharingNone`. This asks macOS to exclude loki from screen capture streams — the same mechanism used by DRM apps and Zoom's toolbar. It's not a GPU trick or special overlay, which is why it's best-effort on macOS 15.4+.
 
 ---
 
 ## Troubleshooting
 
-**"It says give access, but I already gave access."**
-You probably granted an older build. Because the app is ad-hoc signed, a rebuild changes its identity and macOS stops honoring the old grant (the checkmark can linger). Toggle cue **off and on** in System Settings → Screen Recording, or remove and re-add it.
+**"It says I need to grant access, but I already did."**
 
-**A feature returns "403" / "no access to model."**
-Your API key is restricted. Most often it's an OpenAI **project key that only allows chat models** — it works for screen/coding help but 403s on transcription (Whisper). Fix: enable audio/Whisper on the key, use an unrestricted key, or add a Gemini key (cue falls back to it for transcription).
+You likely granted permission to an older build. Since the app is ad-hoc signed, rebuilding changes its identity. Toggle loki off and on in System Settings → Screen Recording, or remove and re-add it.
 
-**Listening does nothing / no transcript.**
-Check Settings shows a transcription-capable key (OpenAI with Whisper, or Gemini). Also make sure Screen Recording is granted (meeting audio needs it).
+**"Getting 403 errors / no access to model."**
 
-**cue shows up in my Zoom share.**
-Set Zoom's **Screen capture mode** to *"Advanced capture with window filtering"* (see Step 3). And remember: on macOS 15.4+ this can still fail — it's best-effort.
+Your API key is restricted. Common issue: OpenAI project keys that only allow chat models work for screen help but fail on transcription (Whisper). Fix: enable audio/Whisper on the key, use an unrestricted key, or add a Gemini key for transcription.
 
-**"cue is damaged and can't be opened."**
-Run `xattr -cr /Applications/cue.app` in Terminal once (see Install → Option A).
+**"Listening feature does nothing / no transcript."**
+
+Ensure you have a transcription-capable key configured (OpenAI with Whisper, or Gemini). Also verify Screen Recording permission is granted (required for meeting audio).
+
+**"loki appears in my Zoom share."**
+
+Set Zoom's Screen capture mode to "Advanced capture with window filtering" (see Step 3 above). Remember this is best-effort on macOS 15.4+.
+
+**"loki is damaged and can't be opened."**
+
+Run `xattr -cr /Applications/loki.app` in Terminal (see Installation → Option A).
 
 ---
 
-## Privacy
+## Privacy & Security
 
-- No accounts, no servers, no telemetry. cue collects nothing.
-- Your API keys live in a local file (`cue-data.json`) and are sent only to the provider you chose.
-- Screenshots and audio are sent to your AI provider only when a feature runs, and are not stored by cue beyond the current session's transcript (kept in memory).
+- No accounts, no servers, no telemetry — loki collects nothing
+- API keys stored locally in `loki-data.json`, sent only to your chosen provider
+- Screenshots and audio sent to AI provider only when features are used
+- Transcripts kept in memory only during current session
+- All processing happens locally except AI API calls
+
+---
 
 ## Contributing
 
-Issues and PRs welcome. cue is intentionally small and readable — `main.js` (app + capture + AI), `renderer/` (the UI), `src/` (providers). No build step for the source (plain HTML/CSS/JS).
+Issues and pull requests are welcome. loki is designed to be small and readable:
+- `main.js` — App logic, capture, and AI integration
+- `renderer/` — UI (HTML, CSS, JavaScript)
+- `src/` — AI provider implementations
 
-## Credits & license
+No build step required for source development (plain HTML/CSS/JS).
 
-Built as an open-source study of how tools like **Cluely** and **Interview Coder** work. Modeled on the open-source clones `pickle-com/glass` and `sohzm/cheating-daddy`.
+---
 
-**License: [GPL-3.0-or-later](LICENSE).**
+## License
+
+**GPL-3.0-or-later**
+
+Built as an open-source study of AI assistant tools. Inspired by projects exploring similar functionality.

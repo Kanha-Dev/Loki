@@ -3,8 +3,8 @@ const fs = require('fs');
 const path = require('path');
 let appPath = null;
 try { appPath = require('electron').app.getPath('userData'); } catch (e) { appPath = null; }
-// Allow tests to override the user data path via env var CUE_USERDATA
-const FILE = path.join(process.env.CUE_USERDATA || appPath || path.join(__dirname, '..', 'data'), 'cue-data.json');
+// Allow tests to override the user data path via env var LOKI_USERDATA
+const FILE = path.join(process.env.LOKI_USERDATA || appPath || path.join(__dirname, '..', 'data'), 'loki-data.json');
 
 const DEFAULTS = {
   provider: 'openai',

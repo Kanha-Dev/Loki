@@ -1,7 +1,7 @@
-/* albert renderer — UI state, mic capture, IPC, streaming render. */
+/* loki renderer — UI state, mic capture, IPC, streaming render. */
 (function () {
   const { icon } = window.ICONS;
-  const cue = window.cue; // exposed by preload
+  const loki = window.loki; // exposed by preload
   const $ = (s) => document.querySelector(s);
 
   // ---- paint icons -------------------------------------------------------
@@ -143,7 +143,7 @@
   function runMode(mode, text) {
     if (busy) return;
     setBusy(true);
-    cue.ask({ mode, text: text || '' });
+    loki.ask({ mode, text: text || '' });
   }
 
   document.querySelectorAll('.act').forEach((btn) => {
@@ -206,7 +206,7 @@
   smartBtn.addEventListener('click', async () => {
     settings.smart = !settings.smart;
     smartBtn.classList.toggle('on', settings.smart);
-    await cue.settingsSet({ smart: settings.smart });
+    await loki.settingsSet({ smart: settings.smart });
   });
 
   // Stop = start/stop listening. Kick off system-audio capture straight from the click so
@@ -214,7 +214,7 @@
   $('#stop-btn').addEventListener('click', () => {
     const turningOn = !$('#stop-btn').classList.contains('active');
     if (turningOn) startSystemAudio();
-    cue.captureToggle();
+    loki.captureToggle();
   });
 
   // ---- capture: mic (renderer side) --------------------------------------
@@ -232,10 +232,10 @@
         const f = e.inputBuffer.getChannelData(0);
         const out = new Int16Array(f.length);
         for (let i = 0; i < f.length; i++) { const s = Math.max(-1, Math.min(1, f[i])); out[i] = s < 0 ? s * 0x8000 : s * 0x7fff; }
-        cue.micPcm(out.buffer);
+        loki.micPcm(out.buffer);
       };
     } catch (err) {
-      cue.log('mic error: ' + (err && err.message));
+      loki.log('mic error: ' + (err && err.message));
     }
   }
   function stopMic() {
@@ -245,7 +245,7 @@
     if (micStream) { micStream.getTracks().forEach((t) => t.stop()); micStream = null; }
   }
 
-  // ---- capture: system/meeting audio (getDisplayMedia loopback, in cue's process) ----
+  // ---- capture: system/meeting audio (getDisplayMedia loopback, in loki's process) ----
   let sysStream = null, sysCtx = null, sysNode = null, sysProc = null;
   async function startSystemAudio() {
     if (sysStream) return;
@@ -253,7 +253,7 @@
       const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
       stream.getVideoTracks().forEach((t) => t.stop()); // we only want the audio
       const tracks = stream.getAudioTracks();
-      if (!tracks.length) { cue.log('system audio: no loopback track (macOS loopback unsupported here)'); stream.getTracks().forEach((t) => t.stop()); return; }
+      if (!tracks.length) { loki.log('system audio: no loopback track (macOS loopback unsupported here)'); stream.getTracks().forEach((t) => t.stop()); return; }
       sysStream = stream;
       sysCtx = new AudioContext({ sampleRate: 16000 });
       sysNode = sysCtx.createMediaStreamSource(new MediaStream(tracks));
@@ -264,11 +264,11 @@
         const f = e.inputBuffer.getChannelData(0);
         const out = new Int16Array(f.length);
         for (let i = 0; i < f.length; i++) { const s = Math.max(-1, Math.min(1, f[i])); out[i] = s < 0 ? s * 0x8000 : s * 0x7fff; }
-        cue.systemPcm(out.buffer);
+        loki.systemPcm(out.buffer);
       };
-      cue.log('system audio: capturing loopback');
+      loki.log('system audio: capturing loopback');
     } catch (err) {
-      cue.log('system audio error: ' + (err && err.message));
+      loki.log('system audio error: ' + (err && err.message));
     }
   }
   function stopSystemAudio() {
@@ -279,20 +279,20 @@
   }
 
   // ---- events from main --------------------------------------------------
-  cue.on('capture:state', ({ active }) => {
+  loki.on('capture:state', ({ active }) => {
     $('#live-dot').classList.toggle('off', !active);
     $('#stop-btn').classList.toggle('active', active);
     if (active) { startMic(); startSystemAudio(); } else { stopMic(); stopSystemAudio(); }
   });
-  cue.on('llm:start', ({ userBubble, small }) => {
+  loki.on('llm:start', ({ userBubble, small }) => {
     // keep prior messages (history) visible; only add the current user bubble
     if (userBubble) addUserBubble(userBubble);
     startAi(!!small);
     setBusy(true);
   });
-  cue.on('llm:token', ({ text }) => appendToken(text));
-  cue.on('llm:done', () => { finalizeAi(); setBusy(false); });
-  cue.on('llm:error', ({ message }) => {
+  loki.on('llm:token', ({ text }) => appendToken(text));
+  loki.on('llm:done', () => { finalizeAi(); setBusy(false); });
+  loki.on('llm:error', ({ message }) => {
     if (!aiEl) startAi(true);
     aiEl.dataset.raw = message;
     finalizeAi();
@@ -301,10 +301,10 @@
   });
   let statusTimer = null;
   function showStatus(message) {
-    let el = document.getElementById('cue-status');
+    let el = document.getElementById('loki-status');
     if (!el) {
       el = document.createElement('div');
-      el.id = 'cue-status';
+      el.id = 'loki-status';
       const panel = document.getElementById('panel');
       panel.insertBefore(el, document.getElementById('action-row'));
     }
@@ -313,8 +313,8 @@
     clearTimeout(statusTimer);
     statusTimer = setTimeout(() => el.classList.remove('show'), 11000);
   }
-  cue.on('status', ({ message }) => { cue.log('[status] ' + message); showStatus(message); appendMainDebug('[status] ' + message); });
-  cue.on('transcript', (turn) => {
+  loki.on('status', ({ message }) => { loki.log('[status] ' + message); showStatus(message); appendMainDebug('[status] ' + message); });
+  loki.on('transcript', (turn) => {
     // Show speech detection indicator when transcript is received
     const liveDot = $('#live-dot');
     if (liveDot) {
@@ -355,7 +355,7 @@
   // Load placeholder state from settings
   async function loadPlaceholderState() {
     try {
-      const currentSettings = await cue.settingsGet();
+      const currentSettings = await loki.settingsGet();
       placeholderEnabled = currentSettings.placeholderEnabled || false;
       placeholderToggle.classList.toggle('on', placeholderEnabled);
     } catch (e) {
@@ -366,7 +366,7 @@
   // Save placeholder state to settings
   async function savePlaceholderState() {
     try {
-      await cue.settingsSet({ placeholderEnabled });
+      await loki.settingsSet({ placeholderEnabled });
     } catch (e) {
       console.error('Failed to save placeholder state:', e);
     }
@@ -485,7 +485,7 @@
   async function generateMeetingNote() {
     try {
       appendMeetingDebug('Requesting meeting note...');
-      const note = await cue.generateMeetingNote(currentMeetingNotes);
+      const note = await loki.generateMeetingNote(currentMeetingNotes);
       if (!note || !note.trim()) {
         appendMeetingDebug('Meeting note returned empty response.', 'warn');
         return;
@@ -528,7 +528,7 @@
     // Start audio capture explicitly
     startMic();
     startSystemAudio();
-    cue.captureSet(true);
+    loki.captureSet(true);
     generateMeetingNote();
     meetingNoteTimer = setInterval(generateMeetingNote, interval);
     appendMeetingDebug('Meeting notes started. Interval: ' + (interval / 1000) + 's');
@@ -583,10 +583,10 @@
     persistToggle.addEventListener('click', async () => {
       settings.chatPersistent = !settings.chatPersistent;
       persistToggle.classList.toggle('on', settings.chatPersistent);
-      await cue.settingsSet({ chatPersistent: settings.chatPersistent });
+      await loki.settingsSet({ chatPersistent: settings.chatPersistent });
       if (settings.chatPersistent) {
         try {
-          const h = await cue.historyGet();
+          const h = await loki.historyGet();
           if (h && h.length) renderHistoryIntoMessages(h);
           else showExample();
         } catch (e) {
@@ -764,7 +764,7 @@
     settings.meetingNotes.intervalSeconds = Math.max(15, Number($('#meeting-notes-interval').value) || 60);
     // Shortcuts are already saved when captured, but ensure they exist
     if (!settings.shortcuts) settings.shortcuts = {};
-    await cue.settingsSet(settings);
+    await loki.settingsSet(settings);
     if (!settings.chatPersistent) {
       showExample();
     }
@@ -900,10 +900,10 @@
           b.classList.remove('active');
         });
         btn.classList.add('active');
-        
+
         // Save settings
         try {
-          await cue.settingsSet({
+          await loki.settingsSet({
             models: {
               [settings.provider]: {
                 ...settings.models[settings.provider],
@@ -942,7 +942,7 @@
       detectionResults.classList.add('hidden');
 
       try {
-        const result = await cue.modelsDetect(settings.provider);
+        const result = await loki.modelsDetect(settings.provider);
         
         if (result.success && result.available && result.available.length > 0) {
           detectionStatus.textContent = `Found ${result.available.length} models`;
@@ -964,14 +964,14 @@
   }
 
   // Listen for automatic detection results from main process
-  cue.on('models:detected', (result) => {
+  loki.on('models:detected', (result) => {
     if (result.success && !detectionResults.classList.contains('hidden')) {
       renderModelsList(result.available, result.recommended);
     }
   });
 
   // Listen for rate limit updates
-  cue.on('ratelimit:updated', (info) => {
+  loki.on('ratelimit:updated', (info) => {
     rateLimitInfo = info;
     // Re-render models list if it's visible to show updated rate limit info
     if (!detectionResults.classList.contains('hidden')) {
@@ -992,7 +992,7 @@
   // Usage tracking UI
   async function updateUsageUI() {
     try {
-      const usage = await cue.usageGet();
+      const usage = await loki.usageGet();
       
       // Update overview stats
       $('#usage-total-tokens').textContent = usage.totalTokens.toLocaleString();
@@ -1076,9 +1076,9 @@
         $('#s-status').textContent = 'Please enter a valid limit (minimum $1)';
         return;
       }
-      
+
       try {
-        await cue.usageSetLimit(limit);
+        await loki.usageSetLimit(limit);
         await updateUsageUI();
         $('#s-status').textContent = 'Monthly limit updated';
       } catch (err) {
@@ -1092,9 +1092,9 @@
       if (!confirm('Are you sure you want to reset all usage data? This cannot be undone.')) {
         return;
       }
-      
+
       try {
-        await cue.usageReset();
+        await loki.usageReset();
         await updateUsageUI();
         $('#s-status').textContent = 'Usage data reset';
       } catch (err) {
@@ -1104,7 +1104,7 @@
   }
 
   // Listen for usage updates
-  cue.on('usage:updated', () => {
+  loki.on('usage:updated', () => {
     updateUsageUI();
   });
 
@@ -1162,7 +1162,7 @@
 
   async function captureAndAddScreenshot() {
     try {
-      const dataUrl = await cue.captureScreenshot();
+      const dataUrl = await loki.captureScreenshot();
       if (dataUrl) {
         capturedImages.push(dataUrl);
         renderLeetCodeScreenshots();
@@ -1201,7 +1201,7 @@
     // If panel is open with collected screenshots, capture one more and send all
     if (leetcodeCollectMode && !leetcodePanel.classList.contains('hidden') && capturedImages.length > 0) {
       try {
-        const dataUrl = await cue.captureScreenshot();
+        const dataUrl = await loki.captureScreenshot();
         if (dataUrl) {
           capturedImages.push(dataUrl);
         }
@@ -1209,13 +1209,13 @@
         appendMainDebug('Screenshot capture failed: ' + (err && err.message));
       }
       closeLeetCodePanel();
-      cue.ask({ mode: 'leetcode', text: '', images: capturedImages });
+      loki.ask({ mode: 'leetcode', text: '', images: capturedImages });
     } else {
       // Panel is closed or no images collected, capture and send immediately
       closeLeetCodePanel();
       try {
-        const dataUrl = await cue.captureScreenshot();
-        cue.ask({ mode: 'leetcode', text: '', images: dataUrl ? [dataUrl] : null });
+        const dataUrl = await loki.captureScreenshot();
+        loki.ask({ mode: 'leetcode', text: '', images: dataUrl ? [dataUrl] : null });
       } catch (err) {
         appendMainDebug('Screenshot capture failed: ' + (err && err.message));
       }
@@ -1233,7 +1233,7 @@
   }
 
   // Listen for leetcode shortcuts from main process
-  cue.on('leetcode:collect', () => {
+  loki.on('leetcode:collect', () => {
     if (leetcodeCollectMode && !leetcodePanel.classList.contains('hidden')) {
       // Panel is open, add screenshot
       captureAndAddScreenshot();
@@ -1243,7 +1243,7 @@
     }
   });
 
-  cue.on('leetcode:send', () => {
+  loki.on('leetcode:send', () => {
     if (leetcodeCollectMode && !leetcodePanel.classList.contains('hidden')) {
       // Panel is open, send collected screenshots
       submitLeetCode();
@@ -1274,7 +1274,7 @@
 
   // ---- click-through: only the UI blocks the mouse; empty gaps pass to your screen ----
   let ignoring = null;
-  function setIgnore(v) { if (v !== ignoring) { ignoring = v; cue.setIgnoreMouse(v); } }
+  function setIgnore(v) { if (v !== ignoring) { ignoring = v; loki.setIgnoreMouse(v); } }
   document.addEventListener('mousemove', (e) => {
     const el = document.elementFromPoint(e.clientX, e.clientY);
     const overUI = !!(el && el.closest && el.closest('#toolbar, #panel-wrap, #meeting-side, #transcript-pane, #settings-wrap, #onboard-scrim, #leetcode-panel'));
@@ -1283,7 +1283,7 @@
   setIgnore(true);
 
   // ---- layout: default positions + drag/resize + persistence ---------------
-  const LAYOUT_KEY = 'cue-ui-layout';
+  const LAYOUT_KEY = 'loki-ui-layout';
   const PANEL_IDS = ['panel-wrap', 'meeting-side', 'transcript-pane', 'toolbar', 'leetcode-panel', 'settings-wrap'];
 
   const DEFAULT_LAYOUT = {
@@ -1588,33 +1588,33 @@
   const OB_STEPS = [
     {
       icon: '👋',
-      title: 'Welcome to albert',
-      body: 'albert is a private AI copilot that floats over your screen. It can <strong>see your screen</strong>, <strong>hear your meetings</strong>, and help you answer questions or solve coding problems — while staying hidden from most screen shares.<br><br>This quick guide gets you running in about a minute.'
+      title: 'Welcome to loki',
+      body: 'loki is a private AI copilot that floats over your screen. It can <strong>see your screen</strong>, <strong>hear your meetings</strong>, and help you answer questions or solve coding problems — while staying hidden from most screen shares.<br><br>This quick guide gets you running in about a minute.'
     },
     {
       icon: '🔐',
-      title: 'Allow cue to see & hear',
-      body: 'cue needs two macOS permissions. Click each button, turn <strong>cue</strong> ON in the window that opens, then come back here.<ul><li><strong>Microphone</strong> — to hear you</li><li><strong>Screen Recording</strong> — to see your screen and hear meeting audio</li></ul>',
+      title: 'Allow loki to see & hear',
+      body: 'loki needs two macOS permissions. Click each button, turn <strong>loki</strong> ON in the window that opens, then come back here.<ul><li><strong>Microphone</strong> — to hear you</li><li><strong>Screen Recording</strong> — to see your screen and hear meeting audio</li></ul>',
       buttons: [
-        { label: 'Open Microphone settings', action: () => cue.openPane('x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone') },
-        { label: 'Open Screen Recording settings', action: () => cue.openPane('x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture') }
+        { label: 'Open Microphone settings', action: () => loki.openPane('x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone') },
+        { label: 'Open Screen Recording settings', action: () => loki.openPane('x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture') }
       ]
     },
     {
       icon: '🔑',
       title: 'Connect an AI provider',
-      body: 'cue uses <strong>your own</strong> API key — pick <span class="hl">OpenAI</span>, <span class="hl">Anthropic</span>, or <span class="hl">Google Gemini</span>. Get a key from your provider, then paste it into cue\'s Settings.<br><br><strong>Tip:</strong> the listening features need speech-to-text access (an OpenAI key with Whisper, or a Gemini key). A chat-only key still powers screen &amp; coding help.',
-      buttons: [{ label: 'Open cue Settings', action: () => { finishOnboard(); openSettings(); } }]
+      body: 'loki uses <strong>your own</strong> API key — pick <span class="hl">OpenAI</span>, <span class="hl">Anthropic</span>, or <span class="hl">Google Gemini</span>. Get a key from your provider, then paste it into loki\'s Settings.<br><br><strong>Tip:</strong> the listening features need speech-to-text access (an OpenAI key with Whisper, or a Gemini key). A chat-only key still powers screen &amp; coding help.',
+      buttons: [{ label: 'Open loki Settings', action: () => { finishOnboard(); openSettings(); } }]
     },
     {
       icon: '🫥',
       title: 'Stay hidden in Zoom',
-      body: 'cue is hidden from most screen shares automatically (Google Meet, Teams, QuickTime — nothing to do). <strong>Zoom needs one setting:</strong><br><br>Zoom → <span class="hl">Settings</span> → <span class="hl">Share Screen</span> → <span class="hl">Advanced</span> → <strong>Screen capture mode</strong> → choose <strong>“Advanced capture with window filtering.”</strong><br><br>Avoid “<strong>without</strong> window filtering” — that mode reveals cue.'
+      body: 'loki is hidden from most screen shares automatically (Google Meet, Teams, QuickTime — nothing to do). <strong>Zoom needs one setting:</strong><br><br>Zoom → <span class="hl">Settings</span> → <span class="hl">Share Screen</span> → <span class="hl">Advanced</span> → <strong>Screen capture mode</strong> → choose <strong>“Advanced capture with window filtering.”</strong><br><br>Avoid “<strong>without</strong> window filtering” — that mode reveals loki.'
     },
     {
       icon: '✨',
       title: 'You’re all set',
-      body: 'How to use cue:<ul><li><span class="kbd">⌘</span> <span class="kbd">↵</span> — <strong>Assist</strong> with whatever\'s on screen or being said</li><li><span class="kbd">⌘</span> <span class="kbd">H</span> — solve a coding problem on screen</li><li>Click <strong>▢</strong> in the top bar to start listening to a meeting</li><li>Type a question and press <span class="kbd">↵</span></li></ul>Reopen this guide anytime by clicking the <strong>cue logo</strong>. Quit with <span class="kbd">⌘</span><span class="kbd">⇧</span><span class="kbd">X</span>.'
+      body: 'How to use loki:<ul><li><span class="kbd">⌘</span> <span class="kbd">↵</span> — <strong>Assist</strong> with whatever\'s on screen or being said</li><li><span class="kbd">⌘</span> <span class="kbd">H</span> — solve a coding problem on screen</li><li>Click <strong>▢</strong> in the top bar to start listening to a meeting</li><li>Type a question and press <span class="kbd">↵</span></li></ul>Reopen this guide anytime by clicking the <strong>loki logo</strong>. Quit with <span class="kbd">⌘</span><span class="kbd">⇧</span><span class="kbd">X</span>.'
     }
   ];
   let obIndex = 0;
@@ -1634,7 +1634,7 @@
   function showOnboard() { obIndex = 0; renderOnboard(); obScrim.classList.remove('hidden'); setIgnore(false); }
   async function finishOnboard() {
     obScrim.classList.add('hidden');
-    if (settings && !settings.onboarded) { settings.onboarded = true; await cue.settingsSet({ onboarded: true }); }
+    if (settings && !settings.onboarded) { settings.onboarded = true; await loki.settingsSet({ onboarded: true }); }
   }
   $('#ob-next').addEventListener('click', () => { if (obIndex === OB_STEPS.length - 1) finishOnboard(); else { obIndex++; renderOnboard(); } });
   $('#ob-back').addEventListener('click', () => { if (obIndex > 0) { obIndex--; renderOnboard(); } });
@@ -1643,12 +1643,12 @@
 
   // ---- boot --------------------------------------------------------------
   (async function boot() {
-    settings = await cue.settingsGet();
+    settings = await loki.settingsGet();
     smartBtn.classList.toggle('on', !!settings.smart);
     try {
       if (settings.chatPersistent) {
         persistToggle.classList.toggle('on', !!settings.chatPersistent);
-        const h = await cue.historyGet();
+        const h = await loki.historyGet();
         if (h && h.length) renderHistoryIntoMessages(h);
         else showExample();
       } else {
@@ -1657,7 +1657,7 @@
       }
     } catch (e) { showExample(); }
     syncPlaceholder();
-    const st = await cue.captureState();
+    const st = await loki.captureState();
     $('#live-dot').classList.toggle('off', !st.active);
     $('#stop-btn').classList.toggle('active', st.active);
     mainDebug.classList.add('hidden');

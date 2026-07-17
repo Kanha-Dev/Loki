@@ -47,8 +47,8 @@ function createWindow() {
     }
   });
 
-  // Invisibility + overlay behavior. Set CUE_NO_PROTECT=1 to disable for debugging.
-  win.setContentProtection(!process.env.CUE_NO_PROTECT);            // excluded from screen capture (best-effort)
+  // Invisibility + overlay behavior. Set LOKI_NO_PROTECT=1 to disable for debugging.
+  win.setContentProtection(!process.env.LOKI_NO_PROTECT);            // excluded from screen capture (best-effort)
   win.setAlwaysOnTop(true, 'screen-saver', 1);
   win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   if (typeof win.setHiddenInMissionControl === 'function') win.setHiddenInMissionControl(true);
@@ -56,7 +56,7 @@ function createWindow() {
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'));
 
   win.webContents.on('did-finish-load', () => win.showInactive());
-  win.webContents.on('render-process-gone', (_e, d) => console.log('[cue] renderer gone', JSON.stringify(d)));
+  win.webContents.on('render-process-gone', (_e, d) => console.log('[loki] renderer gone', JSON.stringify(d)));
 }
 
 // -------- STT flushing --------
@@ -114,8 +114,8 @@ function stopFlushLoop() { if (flushTimer) { clearInterval(flushTimer); flushTim
 
 // -------- capture toggle --------
 // Mic + system audio are both captured in the RENDERER (getUserMedia for the mic,
-// getDisplayMedia loopback for system audio) so they run inside cue's own process
-// and use cue's own Screen-Recording grant — no separate helper binary to authorize.
+// getDisplayMedia loopback for system audio) so they run inside loki's own process
+// and use loki's own Screen-Recording grant — no separate helper binary to authorize.
 function setCapturing(active) {
   state.capturing = active;
   if (active) {
@@ -151,7 +151,7 @@ async function runFeature(mode, userText, images = null) {
         const single = await captureScreenshot();
         imageDataUrls = [single];
       }
-      catch (e) { send('status', { message: 'Screen capture needs permission — grant Screen Recording to cue in System Settings.' }); }
+      catch (e) { send('status', { message: 'Screen capture needs permission — grant Screen Recording to loki in System Settings.' }); }
     }
 
     const built = def.build({ transcript, userText: userText || '' });
@@ -271,7 +271,7 @@ ipcMain.handle('meeting-note:generate', async (_e, previousNotes) => {
   if (!llm.ready) throw new Error('Add your ' + settings.provider + ' API key in Settings to generate meeting notes.');
   const transcriptText = transcript.map((t) => (t.channel === 'them' ? 'Them: ' : 'You: ') + t.text).join('\n');
   const promptParts = [
-    'You are cue, a meeting assistant that summarizes conversation into concise bullet points. Use the transcript below and the previous notes to generate updated meeting notes.',
+    'You are loki, a meeting assistant that summarizes conversation into concise bullet points. Use the transcript below and the previous notes to generate updated meeting notes.',
     previousNotes ? 'Previous notes:\n' + previousNotes : '',
     'Transcript:\n' + (transcriptText || '(no transcript yet)'),
     'Output the complete updated meeting notes as numbered bullet points. Each point should be short and precise (1-2 sentences max). Update existing points minimally when necessary and add new points for new information. Format as:\n1) Point 1\n2) Point 2\n3) Point 3\n\nIf nothing new has happened, return the previous notes unchanged.'
@@ -315,7 +315,7 @@ app.whenReady().then(() => {
   session.defaultSession.setPermissionCheckHandler((_wc, permission) => allowMedia(permission));
 
   // System-audio loopback for getDisplayMedia: hand back a screen source with 'loopback'
-  // audio so the renderer can capture what's playing (Zoom/Meet) using cue's own grant.
+  // audio so the renderer can capture what's playing (Zoom/Meet) using loki's own grant.
   session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
     desktopCapturer.getSources({ types: ['screen'] }).then((sources) => {
       if (sources.length) callback({ video: sources[0], audio: 'loopback' });
