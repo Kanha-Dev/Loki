@@ -4,7 +4,7 @@ out/
 native/systemaudio
 *.log
 .DS_Store
-loki-data.json
+6Eyes-data.json
 .env
 .env.*
 env

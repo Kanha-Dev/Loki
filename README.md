@@ -1,6 +1,6 @@
 <div align="center">
 
-# loki
+# 6Eyes
 
 **An intelligent AI assistant that floats invisibly over your screen — seeing what you see, hearing your conversations, and staying hidden from screen shares.**
 
@@ -11,13 +11,13 @@ A free, open-source alternative to proprietary AI copilots. Bring your own API k
 ---
 
 > [!WARNING]  
-> **Important:** loki attempts to stay hidden from screen recordings, but this is **best-effort, not guaranteed**. On macOS 15.4+, some capture tools may still detect it, and phone cameras always can. Using a hidden assistant during **proctored exams, job interviews, or recorded meetings** may violate platform policies or local consent laws. loki is designed for legitimate use cases: personal note-taking, studying, accessibility, and practice. **You are responsible for how you use it.**
+> **Important:** 6Eyes attempts to stay hidden from screen recordings, but this is **best-effort, not guaranteed**. On macOS 15.4+, some capture tools may still detect it, and phone cameras always can. Using a hidden assistant during **proctored exams, job interviews, or recorded meetings** may violate platform policies or local consent laws. 6Eyes is designed for legitimate use cases: personal note-taking, studying, accessibility, and practice. **You are responsible for how you use it.**
 
 ---
 
 ## Features
 
-loki provides real-time AI assistance by combining three inputs: your screen, your microphone, and meeting audio from other participants.
+6Eyes provides real-time AI assistance by combining three inputs: your screen, your microphone, and meeting audio from other participants.
 
 ### Core Capabilities
 
@@ -45,26 +45,26 @@ loki provides real-time AI assistance by combining three inputs: your screen, yo
 
 ### Option A: Pre-built Application (Recommended)
 
-1. Visit the [Releases](../../releases) page and download `loki-mac.zip`
-2. Unzip the file to get `loki.app`
-3. Move `loki.app` to your Applications folder
-4. **First-time setup:** Since loki is unsigned, macOS requires special handling:
-   - Right-click `loki.app` → Open → click Open in the dialog
-   - If you see "loki is damaged and can't be opened," run this in Terminal:
+1. Visit the [Releases](../../releases) page and download `6Eyes-mac.zip`
+2. Unzip the file to get `6Eyes.app`
+3. Move `6Eyes.app` to your Applications folder
+4. **First-time setup:** Since 6Eyes is unsigned, macOS requires special handling:
+   - Right-click `6Eyes.app` → Open → click Open in the dialog
+   - If you see "6Eyes is damaged and can't be opened," run this in Terminal:
      ```bash
-     xattr -cr /Applications/loki.app
+     xattr -cr /Applications/6Eyes.app
      ```
-   - Then double-click loki.app again
+   - Then double-click 6Eyes.app again
 
-After this initial setup, loki will open normally.
+After this initial setup, 6Eyes will open normally.
 
 ### Option B: Build from Source
 
 Requires Node.js 18+.
 
 ```bash
-git clone https://github.com/Blueturboguy07/loki.git
-cd loki
+git clone https://github.com/Blueturboguy07/6Eyes.git
+cd 6Eyes
 npm install
 npm start
 ```
@@ -72,7 +72,7 @@ npm start
 To build your own application:
 
 ```bash
-npm run pack  # Creates dist/mac-arm64/loki.app
+npm run pack  # Creates dist/mac-arm64/6Eyes.app
 ```
 
 **Note:** Built apps are ad-hoc signed. Rebuilding changes the app identity, so you'll need to regrant macOS permissions. For daily use, build once and keep it.
@@ -81,20 +81,20 @@ npm run pack  # Creates dist/mac-arm64/loki.app
 
 ## Getting Started
 
-When you first launch loki, a built-in tutorial guides you through setup. You can also access it anytime by clicking the loki logo in the top-left corner.
+When you first launch 6Eyes, a built-in tutorial guides you through setup. You can also access it anytime by clicking the 6Eyes logo in the top-left corner.
 
 ### Step 1: Grant macOS Permissions
 
-loki needs permission to see and hear:
+6Eyes needs permission to see and hear:
 
-- **Microphone:** System Settings → Privacy & Security → Microphone → Enable loki
-- **Screen Recording:** System Settings → Privacy & Security → Screen Recording → Enable loki
+- **Microphone:** System Settings → Privacy & Security → Microphone → Enable 6Eyes
+- **Screen Recording:** System Settings → Privacy & Security → Screen Recording → Enable 6Eyes
 
-macOS may ask you to quit and reopen loki after granting permissions.
+macOS may ask you to quit and reopen 6Eyes after granting permissions.
 
 ### Step 2: Configure AI Provider
 
-loki uses your own API keys — no subscription required. Open Settings (⌘ `,`) and add your key:
+6Eyes uses your own API keys — no subscription required. Open Settings (⌘ `,`) and add your key:
 
 | Provider | Where to get key | Notes |
 |----------|------------------|-------|
@@ -102,15 +102,15 @@ loki uses your own API keys — no subscription required. Open Settings (⌘ `,`
 | **Anthropic** | [console.anthropic.com](https://console.anthropic.com) | Excellent for coding and screen help; no speech-to-text, so add OpenAI/Gemini key for audio features |
 | **Google Gemini** | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) | Single key handles both chat and transcription |
 
-Your keys are stored locally in `loki-data.json` and sent only to your chosen provider.
+Your keys are stored locally in `6Eyes-data.json` and sent only to your chosen provider.
 
 ### Step 3: Zoom Configuration (Optional)
 
-loki hides automatically from most screen share tools (Google Meet, Teams, QuickTime). For Zoom, enable this setting:
+6Eyes hides automatically from most screen share tools (Google Meet, Teams, QuickTime). For Zoom, enable this setting:
 
 **Zoom → Settings → Share Screen → Advanced → Screen capture mode → "Advanced capture with window filtering"**
 
-This tells Zoom to respect loki's privacy flag. The "without window filtering" mode will capture loki.
+This tells Zoom to respect 6Eyes's privacy flag. The "without window filtering" mode will capture 6Eyes.
 
 ---
 
@@ -121,7 +121,7 @@ This tells Zoom to respect loki's privacy flag. The "without window filtering" m
 | `⌘` `↵` | Get smart assistance based on current context |
 | `⌘` `H` | Solve the coding problem visible on screen |
 | `⌘` `,` | Open Settings |
-| `⌘` `⇧` `X` | Quit loki |
+| `⌘` `⇧` `X` | Quit 6Eyes |
 
 ---
 
@@ -162,7 +162,7 @@ This tells Zoom to respect loki's privacy flag. The "without window filtering" m
 
 ## Technical Details
 
-loki is built with [Electron](https://www.electronjs.org/). Everything runs locally except AI API calls.
+6Eyes is built with [Electron](https://www.electronjs.org/). Everything runs locally except AI API calls.
 
 ### Architecture
 
@@ -185,7 +185,7 @@ Renderer Process
 
 ### Privacy Implementation
 
-The invisibility feature uses `setContentProtection(true)`, setting `NSWindowSharingNone`. This asks macOS to exclude loki from screen capture streams — the same mechanism used by DRM apps and Zoom's toolbar. It's not a GPU trick or special overlay, which is why it's best-effort on macOS 15.4+.
+The invisibility feature uses `setContentProtection(true)`, setting `NSWindowSharingNone`. This asks macOS to exclude 6Eyes from screen capture streams — the same mechanism used by DRM apps and Zoom's toolbar. It's not a GPU trick or special overlay, which is why it's best-effort on macOS 15.4+.
 
 ---
 
@@ -193,7 +193,7 @@ The invisibility feature uses `setContentProtection(true)`, setting `NSWindowSha
 
 **"It says I need to grant access, but I already did."**
 
-You likely granted permission to an older build. Since the app is ad-hoc signed, rebuilding changes its identity. Toggle loki off and on in System Settings → Screen Recording, or remove and re-add it.
+You likely granted permission to an older build. Since the app is ad-hoc signed, rebuilding changes its identity. Toggle 6Eyes off and on in System Settings → Screen Recording, or remove and re-add it.
 
 **"Getting 403 errors / no access to model."**
 
@@ -203,20 +203,20 @@ Your API key is restricted. Common issue: OpenAI project keys that only allow ch
 
 Ensure you have a transcription-capable key configured (OpenAI with Whisper, or Gemini). Also verify Screen Recording permission is granted (required for meeting audio).
 
-**"loki appears in my Zoom share."**
+**"6Eyes appears in my Zoom share."**
 
 Set Zoom's Screen capture mode to "Advanced capture with window filtering" (see Step 3 above). Remember this is best-effort on macOS 15.4+.
 
-**"loki is damaged and can't be opened."**
+**"6Eyes is damaged and can't be opened."**
 
-Run `xattr -cr /Applications/loki.app` in Terminal (see Installation → Option A).
+Run `xattr -cr /Applications/6Eyes.app` in Terminal (see Installation → Option A).
 
 ---
 
 ## Privacy & Security
 
-- No accounts, no servers, no telemetry — loki collects nothing
-- API keys stored locally in `loki-data.json`, sent only to your chosen provider
+- No accounts, no servers, no telemetry — 6Eyes collects nothing
+- API keys stored locally in `6Eyes-data.json`, sent only to your chosen provider
 - Screenshots and audio sent to AI provider only when features are used
 - Transcripts kept in memory only during current session
 - All processing happens locally except AI API calls
@@ -225,7 +225,7 @@ Run `xattr -cr /Applications/loki.app` in Terminal (see Installation → Option 
 
 ## Contributing
 
-Issues and pull requests are welcome. loki is designed to be small and readable:
+Issues and pull requests are welcome. 6Eyes is designed to be small and readable:
 - `main.js` — App logic, capture, and AI integration
 - `renderer/` — UI (HTML, CSS, JavaScript)
 - `src/` — AI provider implementations

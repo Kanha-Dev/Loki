@@ -1,15 +1,15 @@
 const path = require('path');
 const fs = require('fs');
 
-// Run this from repo root: LOKI_USERDATA=./tmp node scripts/test_store.js
+// Run this from repo root: SIXEYES_USERDATA=./tmp node scripts/test_store.js
 
 console.log('CWD', process.cwd());
-const tmp = path.resolve(process.env.LOKI_USERDATA || './tmp');
+const tmp = path.resolve(process.env.SIXEYES_USERDATA || './tmp');
 if (!fs.existsSync(tmp)) fs.mkdirSync(tmp, { recursive: true });
-process.env.LOKI_USERDATA = tmp;
+process.env.SIXEYES_USERDATA = tmp;
 
 const store = require('../src/store');
-console.log('Store FILE:', require('path').join(process.env.LOKI_USERDATA, 'loki-data.json'));
+console.log('Store FILE:', require('path').join(process.env.SIXEYES_USERDATA, '6Eyes-data.json'));
 
 console.log('Initial settings:', store.getSettings());
 store.appendHistory({ id: new Date().toISOString(), mode: 'test', prompt: 'hello', response: 'world' });
